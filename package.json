@@ -1,0 +1,36 @@
+{
+  "name": "yet-todo",
+  "version": "1.0.0",
+  "description": "Find todo items that are not completed in a given directory, only finds in markdown and todo files (.txt, .md, .mdown, .markdown, .td, .todo, .tasks)",
+  "main": "./yet-todo",
+  "bin": {
+    "yet-todo": "./yet-todo"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "yet-todo": "./yet-todo"
+  },
+  "private": true,
+  "keywords": [
+    "node",
+    "todo"
+  ],
+  "author": "27escape",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.20.0",
+    "consolemd": "^0.2.1",
+    "filehound": "^1.17.0",
+    "filesniffer": "^1.0.3",
+    "shelljs": "^0.8.3"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/27escape/yet-todo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/27escape/yet-todo/issues"
+  },
+  "homepage": "https://github.com/27escape/yet-todo#readme"
+}
