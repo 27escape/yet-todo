@@ -56,10 +56,10 @@ function _replace_atword(match, word, datestr) {
   let resp = "";
   switch (word) {
     case "high":
-      resp = `!#yellow(@${word})`;
+      resp = `#yellow(@${word})`;
       break;
     case "critical":
-      resp = `!#red(@${word})`;
+      resp = `#red(@${word})`;
       break;
     case "due":
       datestr = datestr.replace(/[\(\)]/g, "");

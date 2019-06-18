@@ -1,6 +1,6 @@
 {
   "name": "yet-todo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Find todo items that are not completed in a given directory, only finds in markdown and todo files (.txt, .md, .mdown, .markdown, .td, .todo, .tasks)",
   "main": "./yet-todo",
   "bin": {
