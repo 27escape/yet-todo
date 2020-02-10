@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 /*
   name:    yet-todo
-  purpose: test filesniffer
+  purpose: find files that have '[ ]' style todo items in them
   author:  kevinmu
   email:   kevinmu
   licence: MIT
@@ -12,72 +12,63 @@
 // -----------------------------------------------------------------------------
 
 // make sure we are checking for basic coding errors
-"use strict";
-"use esversion: 6";
+'use strict';
+'use esversion: 6';
+
 const DAY = 86400;
 
 // -----------------------------------------------------------------------------
-// get the library modules brought in
-// npm install -g commander shelljs chalk
 
-// use this process command commandline arguments
-const program = require("commander"),
-  path = require("path"),
-  // comment in/out whichever of these you want to use
-  // may not want colored output
-  // chalk = require("chalk"),
-  console = require("consolemd"),
-  // probably want to use shortcuts
-  shell = require("shelljs"),
-  { FileSniffer, asObject } = require("filesniffer"),
-  FileHound = require("filehound");
+const path = require('path');
+const PROGRAM = path.basename(process.argv[1]).replace(/\.js$/, '');
+const VERSION = '1.1.0';
 
-const PROGRAM = "yet-todo";
-const VERSION = "1.0.0";
-const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
+const program = require('commander');
+const console = require('consolemd');
 
-// -----------------------------------------------------------------------------
+const shell = require('shelljs');
+const { FileSniffer, asObject } = require('filesniffer');
+const FileHound = require('filehound');
 
-function Verbose(init_value) {
-  var _is_verbose = init_value || 0;
-  this.set = function(value) {
-    _is_verbose = value || 0;
-  };
-  this.msg = function(text) {
-    if (_is_verbose) {
-      console.error(`#yellow(${text})`);
-    }
-  };
-}
+const debug = require('debug')(PROGRAM);
+const verbose = require('debug');
+
+const editFile = require('./lib/edit-file');
+
+// const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
 
 // -----------------------------------------------------------------------------
 // handle highlghting of @high, @critical, @due, and then anything left starting with @
-function _replace_atword(match, word, datestr) {
-  let resp = "";
+function _replaceAtword (match, word, datestr) {
+  let resp = '';
+  let color = '#green';
+  let date;
+  let now;
+  let datediff;
+
   switch (word) {
-    case "high":
+    case 'high':
       resp = `#yellow(@${word})`;
       break;
-    case "critical":
+    case 'critical':
       resp = `#red(@${word})`;
       break;
-    case "due":
-      datestr = datestr.replace(/[\(\)]/g, "");
+    case 'due':
+      datestr = datestr.replace(/[()]/g, '');
       // need to ceck the date to decide on the color
       // iso dates are considered to something is -dim text-
-      let color = "#green";
-      const date = Date.parse(datestr);
-      const now = new Date();
-      const datediff = (date - now) / 1000;
+      date = Date.parse(datestr);
+      now = new Date();
+      datediff = (date - now) / 1000;
       if (datediff < 0) {
-        color = "!#red";
+        color = '!#red';
       } else if (datediff < DAY) {
-        color = "#red";
+        color = '#red';
       } else if (datediff < 2 * DAY) {
-        color = "#yellow";
+        color = '#yellow';
       }
 
-      datestr = datestr.replace(/(\d{4})-(\d{2})-(\d{2})/, "$1/$2/$3");
+      datestr = datestr.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3');
       // also put brackets back
       resp = `${color}(@${word}(${datestr}))`;
       break;
@@ -88,37 +79,41 @@ function _replace_atword(match, word, datestr) {
   return resp;
 }
 
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // now we can 'grep for any @today @due etc things and decide how to report them'
 // @critical, @low, @high, @today
 // @due(YYYY-MM-DD)
 // @due(+3)  // in 3 days
-function hilite_matches(matches) {
-  const spaces = "";
+function hiliteMatches (matches, edit) {
+  const spaces = '';
   Object.entries(matches).forEach(([filename, lines]) => {
     console.log(`${path.basename(filename)}:`);
+    if (edit) {
+      debug(`Opening ${filename}`);
+      editFile(filename);
+    }
     for (let line of lines) {
-      line = line.replace(/@(\w+)(\(.*?\))?/g, _replace_atword);
+      line = line.replace(/@(\w+)(\(.*?\))?/g, _replaceAtword);
       console.log(spaces + `${line}`);
     }
-    console.log("");
+    console.log('');
   });
 }
 
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // we have a main function as an async function, so that we can await for activities in it!
 
-async function main() {
+async function main () {
   // get the passed arguments, help provided by default
 
   program
     .description(
-      "yet-todo: find files that have '[ ]' style todo items in them"
+      `${PROGRAM}: find files that have '[ ]' style todo items in them`
     )
-    .version("1.0.0", "--version")
-    // .usage("shorter purpose description")
-    .usage("[options] directory_to_search")
-    // note that this does not remove things from process.argv
+    .version(VERSION, '--version')
+    .option('-v, --verbose', 'enable verbose debug')
+    .option('-e, --edit', 'Edit files with TODO items in them')
+    .usage('[options] directory_to_search')
     .parse(process.argv);
 
   // assuming we want some extra arguments to be passed
@@ -126,11 +121,12 @@ async function main() {
     program.help();
   }
 
-  // do something with the verbose flag
-  const verbose = new Verbose(program.verbose);
+  if (program.verbose) {
+    verbose.enable('*');
+  }
 
   const someDirectory = program.args[0];
-  if (!shell.test("-d", someDirectory)) {
+  if (!shell.test('-d', someDirectory)) {
     console.error(`target directory (${someDirectory}) does not exist`);
     program.help();
   }
@@ -139,7 +135,7 @@ async function main() {
   // only find files that match ones that may have [ ] type todo items in them
   const files = await FileHound.create()
     .path(someDirectory)
-    .ext([".txt", ".md", ".mdown", ".markdown", ".td", ".todo", ".tasks"])
+    .ext(['.txt', '.md', '.mdown', '.markdown', '.td', '.todo', '.tasks'])
     .ignoreHiddenDirectories()
     .ignoreHiddenFiles()
     .find();
@@ -148,9 +144,9 @@ async function main() {
   const matches = await FileSniffer.create()
     .paths(files)
     .collect(asObject())
-    .find("[ ]");
+    .find('[ ]');
 
-  hilite_matches(matches);
+  hiliteMatches(matches, program.edit);
 }
 
 // -----------------------------------------------------------------------------
@@ -158,6 +154,6 @@ async function main() {
 main()
   .then(() => {})
   .catch(err => {
-    console.log("there was an error");
+    console.log('there was an error');
     console.log(err);
   });
