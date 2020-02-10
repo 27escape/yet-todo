@@ -87,7 +87,8 @@ function _replaceAtword (match, word, datestr) {
 function hiliteMatches (matches, edit) {
   const spaces = '';
   Object.entries(matches).forEach(([filename, lines]) => {
-    console.log(`${path.basename(filename)}:`);
+    // console.log(`${path.basename(filename)}:`);
+    console.log(`${filename}:`);
     if (edit) {
       debug(`Opening ${filename}`);
       editFile(filename);
