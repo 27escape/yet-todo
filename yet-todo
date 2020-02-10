@@ -35,12 +35,17 @@ const verbose = require('debug');
 
 const editFile = require('./lib/edit-file');
 
-const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
+// const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
 
 // -----------------------------------------------------------------------------
 // handle highlghting of @high, @critical, @due, and then anything left starting with @
-function _replace_atword (match, word, datestr) {
+function _replaceAtword (match, word, datestr) {
   let resp = '';
+  let color = '#green';
+  let date;
+  let now;
+  let datediff;
+
   switch (word) {
     case 'high':
       resp = `#yellow(@${word})`;
@@ -49,13 +54,12 @@ function _replace_atword (match, word, datestr) {
       resp = `#red(@${word})`;
       break;
     case 'due':
-      datestr = datestr.replace(/[\(\)]/g, '');
+      datestr = datestr.replace(/[()]/g, '');
       // need to ceck the date to decide on the color
       // iso dates are considered to something is -dim text-
-      let color = '#green';
-      const date = Date.parse(datestr);
-      const now = new Date();
-      const datediff = (date - now) / 1000;
+      date = Date.parse(datestr);
+      now = new Date();
+      datediff = (date - now) / 1000;
       if (datediff < 0) {
         color = '!#red';
       } else if (datediff < DAY) {
@@ -80,7 +84,7 @@ function _replace_atword (match, word, datestr) {
 // @critical, @low, @high, @today
 // @due(YYYY-MM-DD)
 // @due(+3)  // in 3 days
-function hilite_matches (matches, edit) {
+function hiliteMatches (matches, edit) {
   const spaces = '';
   Object.entries(matches).forEach(([filename, lines]) => {
     console.log(`${path.basename(filename)}:`);
@@ -89,7 +93,7 @@ function hilite_matches (matches, edit) {
       editFile(filename);
     }
     for (let line of lines) {
-      line = line.replace(/@(\w+)(\(.*?\))?/g, _replace_atword);
+      line = line.replace(/@(\w+)(\(.*?\))?/g, _replaceAtword);
       console.log(spaces + `${line}`);
     }
     console.log('');
@@ -142,7 +146,7 @@ async function main () {
     .collect(asObject())
     .find('[ ]');
 
-  hilite_matches(matches, program.edit);
+  hiliteMatches(matches, program.edit);
 }
 
 // -----------------------------------------------------------------------------
