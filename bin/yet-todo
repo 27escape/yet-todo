@@ -33,7 +33,7 @@ const FileHound = require('filehound');
 const debug = require('debug')(PROGRAM);
 const verbose = require('debug');
 
-const editFile = require('./lib/edit-file');
+const editFile = require('../lib/edit-file');
 
 // const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
 
@@ -84,7 +84,15 @@ function _replaceAtword (match, word, datestr) {
 // @critical, @low, @high, @today
 // @due(YYYY-MM-DD)
 // @due(+3)  // in 3 days
-function hiliteMatches (matches, edit) {
+//
+// print out the matching lines
+//
+// @method     hiliteMatches
+// @param      {Object}  matches  The matches
+// @param      {Boolean}  edit     The edit
+// @param      {Object}  show     Contains before, after the number of lines before/after a match to print out
+//
+function hiliteMatches (matches, edit, show) {
   const spaces = '';
   Object.entries(matches).forEach(([filename, lines]) => {
     // console.log(`${path.basename(filename)}:`);
@@ -101,6 +109,22 @@ function hiliteMatches (matches, edit) {
   });
 }
 
+/**
+ * validate that the value used for line count is a number
+ *
+ * @method     _validateLineCount
+ * @param      {String}  count   The count
+ */
+function _validateLineCount (count) {
+  let newCount = parseInt(count);
+
+  if (!count.match(/^\d+$/)) {
+    console.warn(`Passed value ${count} is not a valid`);
+    newCount = 0;
+  }
+  return newCount;
+}
+
 // -----------------------------------------------------------------------------
 // we have a main function as an async function, so that we can await for activities in it!
 
@@ -114,6 +138,9 @@ async function main () {
     .version(VERSION, '--version')
     .option('-v, --verbose', 'enable verbose debug')
     .option('-e, --edit', 'Edit files with TODO items in them')
+    .option('-A, --after <value>', 'Number of lines to show after a match', _validateLineCount)
+    .option('-B, --before <value>', 'Number of lines to show before a match', _validateLineCount)
+    .option('-C, --count <value>', 'Number of lines to show before and after a match', _validateLineCount)
     .usage('[options] directory_to_search')
     .parse(process.argv);
 
@@ -132,6 +159,12 @@ async function main () {
     program.help();
   }
 
+  // make sure things are the same if required
+  if (program.count) {
+    program.before = program.count;
+    program.after = program.count;
+  }
+
   // need a try/catch around the following sections, in case someDirectory was rubbish
   // only find files that match ones that may have [ ] type todo items in them
   const files = await FileHound.create()
@@ -147,7 +180,7 @@ async function main () {
     .collect(asObject())
     .find('[ ]');
 
-  hiliteMatches(matches, program.edit);
+  hiliteMatches(matches, program.edit, { before: program.before, after: program.after });
 }
 
 // -----------------------------------------------------------------------------

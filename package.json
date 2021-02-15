@@ -4,7 +4,7 @@
   "description": "Find todo items that are not completed in a given directory, only finds in markdown and todo files (.txt, .md, .mdown, .markdown, .td, .todo, .tasks)",
   "main": "./yet-todo",
   "bin": {
-    "yet-todo": "./yet-todo"
+    "yet-todo": "bin/yet-todo"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
