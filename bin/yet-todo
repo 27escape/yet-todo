@@ -24,7 +24,8 @@ const PROGRAM = path.basename(process.argv[1]).replace(/\.js$/, '');
 const VERSION = '1.1.0';
 
 const program = require('commander');
-const console = require('consolemd');
+// this may be a local repo, install with npm link nordchalk
+const nordchalk = require('nordchalk');
 
 const shell = require('shelljs');
 const { FileSniffer, asObject } = require('filesniffer');
@@ -35,48 +36,63 @@ const verbose = require('debug');
 
 const editFile = require('../lib/edit-file');
 
-// const CONFIG_DIR = path.join(process.env.HOME, `.${PROGRAM}`);
+const color_normal = nordchalk.snowstorm0;
+const color_critical = nordchalk.aurora0;
+const color_high = nordchalk.aurora1;
+const color_due = nordchalk.bgAurora0.bold;
+const color_nametag = nordchalk.frost3;
+const color_hashtag = nordchalk.frost2;
+
+console.log(nordchalk.bgSnowstorm1.red('snowstorm background with red text!'));
 
 // -----------------------------------------------------------------------------
 // handle highlghting of @high, @critical, @due, and then anything left starting with @
 function _replaceAtword (match, word, datestr) {
   let resp = '';
-  let color = '#green';
   let date;
   let now;
   let datediff;
+  let color = color_normal;
 
   switch (word) {
     case 'high':
-      resp = `#yellow(@${word})`;
+      resp = color_high(`@${word}`);
       break;
     case 'critical':
-      resp = `#red(@${word})`;
+      resp = color_critical(`@${word}`);
       break;
     case 'due':
       datestr = datestr.replace(/[()]/g, '');
-      // need to ceck the date to decide on the color
-      // iso dates are considered to something is -dim text-
+      // need to check the date to decide on the color
       date = Date.parse(datestr);
       now = new Date();
       datediff = (date - now) / 1000;
       if (datediff < 0) {
-        color = '!#red';
+        color = color_due;
       } else if (datediff < DAY) {
-        color = '#red';
+        color = color_critical;
       } else if (datediff < 2 * DAY) {
-        color = '#yellow';
+        color = color_high;
       }
 
-      datestr = datestr.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3');
-      // also put brackets back
-      resp = `${color}(@${word}(${datestr}))`;
+      // put brackets back on
+      resp = color(`@${word}(${datestr})`);
       break;
     default:
-      resp = `*#cyan(@${word})*`;
+      resp = color_nametag(`@${word}`);
   }
 
   return resp;
+}
+
+// -----------------------------------------------------------------------------
+// hashtags get colored, unless they are datestrings
+function _replaceHashTag (match, word) {
+  if (!word.match(/(\d{4})-(\d{2})-(\d{2})/)) {
+    return color_hashtag(word);
+  } else {
+    return word;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -102,7 +118,11 @@ function hiliteMatches (matches, edit, show) {
       editFile(filename);
     }
     for (let line of lines) {
+      // the markdown processing replaces -something- as dim, lets keep our dates at least
+      // line = line.replace(/(\d{4})-(\d{2})-(\d{2})/g, '$1.$2.$3');
+
       line = line.replace(/@(\w+)(\(.*?\))?/g, _replaceAtword);
+      line = line.replace(/(#[\w-_]+)/g, _replaceHashTag);
       console.log(spaces + `${line}`);
     }
     console.log('');
@@ -132,9 +152,8 @@ async function main () {
   // get the passed arguments, help provided by default
 
   program
-    .description(
-      `${PROGRAM}: find files that have '[ ]' style todo items in them`
-    )
+    .storeOptionsAsProperties()
+    .description(`${PROGRAM}: find files that have '[ ]' style todo items in them`)
     .version(VERSION, '--version')
     .option('-v, --verbose', 'enable verbose debug')
     .option('-e, --edit', 'Edit files with TODO items in them')

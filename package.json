@@ -18,11 +18,11 @@
   "author": "27escape",
   "license": "MIT",
   "dependencies": {
-    "commander": "^2.20.0",
-    "consolemd": "^0.2.1",
+    "commander": "^8.1.0",
     "debug": "^4.1.1",
     "filehound": "^1.17.0",
     "filesniffer": "^1.0.3",
+    "nordchalk": "^0.1.2",
     "shelljs": "^0.8.3"
   },
   "devDependencies": {
