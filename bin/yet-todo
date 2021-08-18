@@ -43,8 +43,6 @@ const color_due = nordchalk.bgAurora0.bold;
 const color_nametag = nordchalk.frost3;
 const color_hashtag = nordchalk.frost2;
 
-console.log(nordchalk.bgSnowstorm1.red('snowstorm background with red text!'));
-
 // -----------------------------------------------------------------------------
 // handle highlghting of @high, @critical, @due, and then anything left starting with @
 function _replaceAtword (match, word, datestr) {
@@ -152,10 +150,9 @@ async function main () {
   // get the passed arguments, help provided by default
 
   program
-    .storeOptionsAsProperties()
-    .description(`${PROGRAM}: find files that have '[ ]' style todo items in them`)
+    .description(`${PROGRAM}: find files that have '[ ]' style todo items in them and either #todo or #task`)
     .version(VERSION, '--version')
-    .option('-v, --verbose', 'enable verbose debug')
+    .option('-v, --verbose', 'enable verbose debug', , function () { verbose.enable('*'); })
     .option('-e, --edit', 'Edit files with TODO items in them')
     .option('-A, --after <value>', 'Number of lines to show after a match', _validateLineCount)
     .option('-B, --before <value>', 'Number of lines to show before a match', _validateLineCount)
@@ -163,13 +160,11 @@ async function main () {
     .usage('[options] directory_to_search')
     .parse(process.argv);
 
+    const options = program.opts() ;
+
   // assuming we want some extra arguments to be passed
   if (!program.args || !program.args.length) {
     program.help();
-  }
-
-  if (program.verbose) {
-    verbose.enable('*');
   }
 
   const someDirectory = program.args[0];
@@ -179,9 +174,9 @@ async function main () {
   }
 
   // make sure things are the same if required
-  if (program.count) {
-    program.before = program.count;
-    program.after = program.count;
+  if (options.count) {
+    options.before = options.count;
+    options.after = options.count;
   }
 
   // need a try/catch around the following sections, in case someDirectory was rubbish
@@ -197,9 +192,10 @@ async function main () {
   const matches = await FileSniffer.create()
     .paths(files)
     .collect(asObject())
-    .find('[ ]');
+    // find outstanding tasks tagged as todo or task
+    .find(/\s\[ \]\s.*?(#todo|#task)/);
 
-  hiliteMatches(matches, program.edit, { before: program.before, after: program.after });
+  hiliteMatches(matches, options.edit, { before: options.before, after: options.after });
 }
 
 // -----------------------------------------------------------------------------
