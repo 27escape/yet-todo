@@ -1,3 +1,12 @@
+# [1.2.0](https://github.com/27escape/yet-todo/compare/v1.1.2...v1.2.0) (2021-08-24)
+
+
+### Bug Fixes
+
+* missplaced comma broke script ([708513e](https://github.com/27escape/yet-todo/commit/708513e04d5090e9bb636da23f336e006f3b2086))
+
+
+
 ## [1.1.2](https://github.com/27escape/yet-todo/compare/v1.1.1...v1.1.2) (2021-08-18)
 
 

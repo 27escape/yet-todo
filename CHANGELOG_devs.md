@@ -1,3 +1,12 @@
+## 1.2.0 (2021-08-24)
+
+* build: bump version - minor ([4dfec70](https://github.com/27escape/yet-todo/commit/4dfec70))
+* fix: missplaced comma broke script ([708513e](https://github.com/27escape/yet-todo/commit/708513e))
+* chore: fix dependabot alert ([22dea2e](https://github.com/27escape/yet-todo/commit/22dea2e))
+* release: updating changelogs for 1.1.2 ([7f30912](https://github.com/27escape/yet-todo/commit/7f30912))
+
+
+
 ## <small>1.1.2 (2021-08-18)</small>
 
 * build: bump version - patch ([11c013f](https://github.com/27escape/yet-todo/commit/11c013f))
