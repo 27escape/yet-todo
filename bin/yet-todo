@@ -152,7 +152,7 @@ async function main () {
   program
     .description(`${PROGRAM}: find files that have '[ ]' style todo items in them and either #todo or #task`)
     .version(VERSION, '--version')
-    .option('-v, --verbose', 'enable verbose debug', , function () { verbose.enable('*'); })
+    .option('-v, --verbose', 'enable verbose debug', function () { verbose.enable('*'); })
     .option('-e, --edit', 'Edit files with TODO items in them')
     .option('-A, --after <value>', 'Number of lines to show after a match', _validateLineCount)
     .option('-B, --before <value>', 'Number of lines to show before a match', _validateLineCount)
@@ -160,7 +160,7 @@ async function main () {
     .usage('[options] directory_to_search')
     .parse(process.argv);
 
-    const options = program.opts() ;
+  const options = program.opts();
 
   // assuming we want some extra arguments to be passed
   if (!program.args || !program.args.length) {
