@@ -19,15 +19,16 @@
   "license": "MIT",
   "dependencies": {
     "commander": "^8.1.0",
-    "debug": "^4.1.1",
-    "filehound": "^1.17.0",
+    "debug": "^4.3.2",
+    "filehound": "^1.17.4",
     "filesniffer": "^1.0.3",
-    "nordchalk": "^0.1.2",
-    "shelljs": "^0.8.3"
+    "nordchalk": "^0.1.4",
+    "shelljs": "^0.8.4"
   },
   "devDependencies": {
     "check-imports": "^0.1.12",
-    "path-parse": ">=1.0.7"
+    "path-parse": ">=1.0.7",
+    "axios": ">=0.21.2"
   },
   "repository": {
     "type": "git",
