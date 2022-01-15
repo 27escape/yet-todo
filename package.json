@@ -23,7 +23,7 @@
     "filehound": "^1.17.5",
     "filesniffer": "^1.0.3",
     "nordchalk": "^0.1.4",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "check-imports": "^0.1.12",
