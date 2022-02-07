@@ -1,3 +1,12 @@
+# [1.3.0](https://github.com/27escape/yet-todo/compare/v1.2.0...v1.3.0) (2022-02-07)
+
+
+### Bug Fixes
+
+* dependabot issues ([8bd8a3b](https://github.com/27escape/yet-todo/commit/8bd8a3b891958cd88c80e9a894e3a84ad733bdd5))
+
+
+
 # [1.2.0](https://github.com/27escape/yet-todo/compare/v1.1.2...v1.2.0) (2021-08-24)
 
 
