@@ -18,17 +18,17 @@
   "author": "27escape",
   "license": "MIT",
   "dependencies": {
-    "commander": "^8.3.0",
-    "debug": "^4.3.2",
+    "commander": "^9.0.0",
+    "debug": "^4.3.3",
     "filehound": "^1.17.5",
     "filesniffer": "^1.0.3",
     "nordchalk": "^0.1.4",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "check-imports": "^0.1.12",
     "path-parse": ">=1.0.7",
-    "axios": ">=0.24.0"
+    "axios": ">=0.25.0"
   },
   "repository": {
     "type": "git",
