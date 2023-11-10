@@ -28,7 +28,7 @@
   "devDependencies": {
     "check-imports": "^0.1.12",
     "path-parse": ">=1.0.7",
-    "axios": ">=0.25.0"
+    "axios": ">=1.6.0"
   },
   "repository": {
     "type": "git",
